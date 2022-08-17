@@ -1,0 +1,29 @@
+
+public static void main(String[] args) throws InterruptedException {
+	
+	ExecutorService executor = Executors.newFixedThreadPool( nThreads: 4);
+	
+	CyclicBarrier barrier = new CyclicBarrier(parties:3);
+	executor.submit(new Task(barrier));
+	executor.submit(new Task(barrier));
+	executor.submit(new Task(barrier));
+	Thread.sleep( millis: 2000);
+}
+
+
+public static class Task implements Runnable {
+	private CyclicBarrier barrier;
+	public Task(CyclicBarrier barrier) { this.barrier = barrier; }
+	@Override
+	public void run() {
+		while (true) {
+			try{
+				barrier.await();
+			} catch (InterruptedException | BrokenBarrierException e) {
+				e.printStackTrace();
+			}
+			// send message to corresponding system
+		}
+	}
+
+}
