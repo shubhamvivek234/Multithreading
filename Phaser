@@ -1,0 +1,32 @@
+
+public static void main(String[] args) {
+	
+	ExecutorService executor = Executors.newFixedThreadPool( nThreads: 4);
+	
+	Phaser phaser = new Phaser( parties: 1) ;  // self-register
+	executor.submit(new Service(phaser));
+	executor.submit(new Service(phaser));
+	
+	phaser.arriveAndAwaitAdvance();
+	
+	phaser.bulkRegister( parties: 4);  // bulk register later
+}
+public static class Service implements Runnable {
+	
+}
+	private Phaser phaser;
+	
+	public Service(Phaser phaser) 
+	{
+		this.phaser = phaser; 
+		
+	}
+	@Override
+	public void run() { 
+  
+	phaser.register();     // Allow threads to register themselves
+	  // some operations 
+	phaser.arrive();
+	  // other operations
+	}
+}
