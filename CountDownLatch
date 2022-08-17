@@ -1,0 +1,27 @@
+public static void main(String[] args) throws Interrupted Exception {
+	
+	ExecutorService executor = Executors.newFixedThreadPool( nThreads: 4);
+	
+    CounDownLatch latch = new Count Down Latch(3);
+	executor.submit(new Dependent Service(latch));
+	executor.submit(new Dependent Service(latch));
+	executor.submit(new Dependent Service(latch));
+	
+	latch.await();
+	
+	System.out.println("All dependant services initialized");
+	
+}
+public static class Dependent Service implements Runnable {
+	
+	private CountDown Latch latch;
+	
+	public Dependent Service(Count Down Latch latch) { this.latch = latch; }
+	
+	@Override
+	public void run {
+
+		latch.countDown();
+		// continue w/ other operations
+	}
+}
