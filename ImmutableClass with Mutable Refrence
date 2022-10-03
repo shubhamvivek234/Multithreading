@@ -1,0 +1,104 @@
+Address Class
+
+public class Address implements Cloneable{
+
+    String firstLine;
+    String secondLine;
+    String city;
+     
+    public Address(String firstLine, String secondLine, String city) {
+        super();
+        this.firstLine = firstLine;
+        this.secondLine = secondLine;
+        this.city = city;
+    }
+ 
+    public String getFirstLine() {
+        return firstLine;
+    }
+ 
+    public void setFirstLine(String firstLine) {
+        this.firstLine = firstLine;
+    }
+ 
+    public String getSecondLine() {
+        return secondLine;
+    }
+ 
+    public void setSecondLine(String secondLine) {
+        this.secondLine = secondLine;
+    }
+ 
+    public String getCity() {
+        return city;
+    }
+ 
+    public void setCity(String city) {
+        this.city = city;
+    }
+ 
+    @Override
+    public String toString() {
+        return "Address [firstLine=" + firstLine + ", secondLine=" + secondLine 
+                + ", city=" + city + "]";
+    }
+}
+
+
+
+USER CLASS
+
+public final class User {
+    private final String firstName;
+    private final String lastName;
+    private final Address address;
+     
+    public User(String firstName, String lastName, Address address) {
+        super();
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+    }
+    public String getFirstName() {
+        return firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public Address getAddress() {
+        return address;
+    }   
+}
+
+public final class User {
+    private final String firstName;
+    private final String lastName;
+    private final Address address;
+     
+    public User(String firstName, String lastName, Address address) {
+        super();
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+    }
+    public String getFirstName() {
+        return firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public Address getAddress() {
+        return address.clone();     // ----------CLONE TO RETURN DEEPCOPY
+    }   
+}
+
+Instead of returning the original Address instance, we will return deep cloned copy of that Adress instance. 
+Even if third party user makes any changes to this cloned address object, it will not affect the original address object of User object.
+
+clone() method only works if Address has implemented Cloneable interface. If it has not implemented it, then we have to manually
+deep copy all the fields of Address class. But most of the user library has support for Cloneable and Serializable interfaces.
+
+
+
+
+
