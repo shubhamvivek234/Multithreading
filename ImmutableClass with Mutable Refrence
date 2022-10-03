@@ -100,5 +100,34 @@ deep copy all the fields of Address class. But most of the user library has supp
 
 
 
+Mutable Collections As Field Of Immutable Object
+
+public final class User {
+    String firstName;
+    String lastName;
+    ArrayList<Address> addressList;
+     
+    public User(String firstName, String lastName, ArrayList<Address> addressList) {
+        super();
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.addressList = addressList;
+    }
+    public String getFirstName() {
+        return firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public ArrayList<Address> getAddress(){
+        return (ArrayList)Collections.unmodifiableCollection(addressList);      //--deep cloning using unmodifiable collection
+    }     
+}
+
+hese Unmodifiable collections are just a wrapper around normal Collection
+classes which throws UnsupportedOperationException from all the methods which tries to modify Collection i.e. add(), remove()
+
+
+
 
 
