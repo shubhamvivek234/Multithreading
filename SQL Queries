@@ -1,0 +1,52 @@
+
+Q.) Select Manager name of the employee having 2nd highest salary
+
+Employee Table
+
+eid | empName | salary
+    |         |
+
+
+Manager Table
+
+managerName | id
+            |
+             
+             
+ Select m.manager Name from manager m  where m.id in
+ ( select eid from employee
+  (select salary from employee 
+   OrderBy salary DESC LIMIT 2)
+   Order By salary Limit 1);
+   
+  
+ ---------------------------------------------------------------------------------------------------------------------------------------------==-----------
+ 
+ Q.)
+ 
+ 
+ Employee Table
+ 
+ Empid  |  empname
+        |
+        
+        
+        
+  Department Table
+  
+  Deptid | Dept Name
+         |
+         
+  Employee _ Department
+  
+  empid | deptid
+        |
+        
+        
+        
+        
+        
+        
+         
+         
+         
