@@ -22,12 +22,12 @@ managerName | id
   
  ---------------------------------------------------------------------------------------------------------------------------------------------==-----------
  
- Q.)
+ Q.) Select the name  of employee who is working inn maximum department
  
  
  Employee Table
  
- Empid  |  empname
+ eid  |  ename
         |
         
         
@@ -37,12 +37,15 @@ managerName | id
   Deptid | Dept Name
          |
          
-  Employee _ Department
+ Mapping Table 
   
-  empid | deptid
+  empid | depid
         |
         
-        
+       
+    Select ename,eid from employee  where empid in(
+    select empid,max(count) from(
+    select empid ,count(depid) from mappingv group by empid));
         
         
         
