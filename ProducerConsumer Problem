@@ -102,6 +102,12 @@ public class Threadexample {
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Using linked blocking queue
 
+BlockingQueue interface supports flow control (in addition to queue) by introducing blocking if either BlockingQueue 
+is full or empty. A thread trying to enqueue an element in a full queue is blocked until some other thread makes space 
+in the queue, either by dequeuing one or more elements or clearing the queue completely. Similarly, it blocks a thread 
+trying to delete from an empty queue until some other threads insert an item. BlockingQueue does not accept a null value. 
+
+
 
 
 class Producer implements Runnable {
