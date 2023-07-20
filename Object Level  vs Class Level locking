@@ -1,0 +1,71 @@
+ObjectLevel Locking
+
+Object-level locking in Java is a synchronization technique where threads acquire a 
+lock on a specific instance of an object. It ensures that only one thread can execute 
+synchronized blocks or methods on a particular instance at a time
+
+
+
+class Counter {
+    private int count = 0;
+
+    public void increment() {
+        synchronized (this) {
+            count++;
+        }
+    }
+
+    public void decrement() {
+        synchronized (this) {
+            count--;
+        }
+    }
+
+    public int getCount() {
+        synchronized (this) {
+            return count;
+        }
+    }
+}
+
+public class ObjectLevelLockingExample {
+    public static void main(String[] args) {
+        Counter counter = new Counter();
+
+        Thread incrementThread = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                counter.increment();
+            }
+        });
+
+        Thread decrementThread = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                counter.decrement();
+            }
+        });
+
+        incrementThread.start();
+        decrementThread.start();
+
+        try {
+            incrementThread.join();
+            decrementThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Final Counter Value: " + counter.getCount());
+    }
+}
+
+
+
+
+When a thread calls any of these synchronized methods, it acquires the lock on the specific instance of the Counter object.
+If another thread tries to access any of these synchronized methods on the same instance, it will be blocked until the first
+thread releases the lock by finishing its work in the synchronized block.
+
+The incrementThread and decrementThread are two separate threads that concurrently execute increment() and decrement()
+methods of the Counter instance, respectively. Thanks to the object-level locking, the counter updates are done atomically 
+and safely, and the final output of the getCount() method will always be 0 because the increments and decrements cancel each other out.
+
