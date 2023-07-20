@@ -1,3 +1,35 @@
+Let's understand how Double-Checked Locking works:
+
+The getInstance() method checks if the instance is null without acquiring the lock. 
+This allows threads to quickly determine if the instance is already created and return 
+it without the need for synchronization, which is a performance optimization.
+
+If instance is null, the synchronized block is entered. This synchronization block is known
+as the critical section, and it is only entered if the instance has not been created yet.
+
+Inside the critical section, the instance is checked again. This second check ensures that if 
+multiple threads reached the first check and one of them successfully creates the instance, 
+other threads will not recreate the instance again when they enter the synchronized block.
+
+If instance is still null, the object is created within the synchronized block. Since the critical 
+section is synchronized, only one thread can enter it at a time, ensuring that the object creation is thread-safe.
+
+After the instance is created, subsequent calls to getInstance() will not enter the synchronized
+block because the first check (non-null check) will fail, and the already created instance will be directly returned.
+
+It's important to note that the volatile keyword is used with the instance variable to ensure
+that multiple threads access the most up-to-date value of instance, preventing issues like stale
+object references in a multi-threaded environment.
+
+While Double-Checked Locking is a useful pattern, it's worth mentioning that it's primarily 
+relevant for Java versions before Java 5. Starting from Java 5, the Java Memory Model has been improved, 
+and the use of volatile and other synchronization primitives is more straightforward and effective. 
+Therefore, modern Java applications typically prefer using static inner classes for singleton implementations,
+which provide a safer and more concise alternative to Double-Checked Locking.
+
+
+
+
 
 class Singleton {
     private volatile static Singleton instance;
