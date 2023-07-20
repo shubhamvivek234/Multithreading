@@ -1,5 +1,7 @@
- 
- 
+ Using wait and Notify 
+
+
+
  public static class PC {
  
   LinkedList<Integer> list = new LinkedList<>();
@@ -97,3 +99,67 @@ public class Threadexample {
         t2.join();
     }
      
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Using linked blocking queue
+
+
+
+class Producer implements Runnable {
+    private LinkedBlockingQueue<Integer> queue;
+    private int maxCount;
+
+    public Producer(LinkedBlockingQueue<Integer> queue, int maxCount) {
+        this.queue = queue;
+        this.maxCount = maxCount;
+    }
+
+    @Override
+    public void run() {
+        try {
+            for (int i = 1; i <= maxCount; i++) {
+                System.out.println("Producing: " + i);
+                queue.put(i); // Add data to the queue
+                Thread.sleep(1000); // Simulate some processing time
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class Consumer implements Runnable {
+    private LinkedBlockingQueue<Integer> queue;
+
+    public Consumer(LinkedBlockingQueue<Integer> queue) {
+        this.queue = queue;
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                int data = queue.take(); // Retrieve data from the queue (waits if the queue is empty)
+                System.out.println("Consuming: " + data);
+                Thread.sleep(2000); // Simulate some processing time
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public class ProducerConsumerExample {
+    public static void main(String[] args) {
+        LinkedBlockingQueue<Integer> queue = new LinkedBlockingQueue<>(5);
+        int maxCount = 10;
+
+        Producer producer = new Producer(queue, maxCount);
+        Consumer consumer = new Consumer(queue);
+
+        Thread producerThread = new Thread(producer);
+        Thread consumerThread = new Thread(consumer);
+
+        producerThread.start();
+        consumerThread.start();
+    }
+}
