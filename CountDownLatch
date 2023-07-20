@@ -25,3 +25,64 @@ public static class Dependent Service implements Runnable {
 		// continue w/ other operations
 	}
 }
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+Alternate example
+
+
+
+public class CountDownLatchExample {
+    public static void main(String[] args) throws InterruptedException {
+        int numThreads = 5;
+        CountDownLatch latch = new CountDownLatch(numThreads);
+
+        for (int i = 0; i < numThreads; i++) {
+            Thread thread = new Thread(new Worker(i, latch));
+            thread.start();
+        }
+
+        // Wait for all worker threads to complete
+        latch.await();
+
+        System.out.println("All workers have completed. Main thread can proceed.");
+    }
+}
+
+class Worker implements Runnable {
+    private int id;
+    private CountDownLatch latch;
+
+    public Worker(int id, CountDownLatch latch) {
+        this.id = id;
+        this.latch = latch;
+    }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println("Worker " + id + " is performing its task.");
+            Thread.sleep(2000); // Simulating some task
+            System.out.println("Worker " + id + " has completed its task.");
+            latch.countDown(); // Notify the latch that this worker has completed its task
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+The program creates and starts five Worker threads, each with an ID from 0 to 4.
+The Worker threads simulate performing a task by sleeping for 2 seconds.
+
+The Worker threads run in parallel, and their output is interleaved.
+
+Once each Worker thread completes its task, it calls countDown() on the CountDownLatch,
+decrementing the count.
+
+The main thread calls await() on the CountDownLatch, which blocks until the count reaches zero. 
+This means the main thread will wait until all the Worker threads have completed their tasks.
+
+The main thread waits for all the workers to complete by calling the await() method on the latch. 
+The await() method blocks until the latch count reaches zero, indicating that all the workers have
+finished their tasks. Once all the workers complete and the count reaches zero, the main thread continues 
+with its work.
