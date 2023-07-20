@@ -49,3 +49,39 @@ class Singleton {
         return instance;
     }
 }
+
+--------------------------------------------------------------------------------------------------------------
+Alternative using inner class
+
+public class Singleton {
+    // Private constructor to prevent instantiation from outside the class
+    private Singleton() {}
+
+    // Static inner class that holds the singleton instance
+    private static class SingletonHolder {
+        // Static final field that holds the singleton instance
+        private static final Singleton instance = new Singleton();
+    }
+
+    // Public method to access the singleton instance
+    public static Singleton getInstance() {
+        return SingletonHolder.instance;
+    }
+}
+
+
+The Singleton class has a private constructor, preventing instantiation from outside the class.
+
+Inside the Singleton class, we have a private static inner class called SingletonHolder. 
+This inner class is not loaded until it is referenced, and it is loaded only once, lazily, 
+when the getInstance() method is called for the first time.
+
+The SingletonHolder class contains a static final field instance, 
+which is the actual singleton instance. Since the instance field is marked final,
+it guarantees that the singleton instance is initialized only once, and no other 
+reference can modify it.
+
+The getInstance() method is a public static method that returns the singleton instance. 
+When this method is called, the SingletonHolder class is loaded, and the instance field 
+is initialized with the singleton instance. Subsequent calls to getInstance() will return
+the same instance without any additional synchronization.
