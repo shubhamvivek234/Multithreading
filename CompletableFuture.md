@@ -1,4 +1,4 @@
-CompletableFuture Eaxmple with exception handling
+1>CompletableFuture Eaxmple with exception handling
 
 
 import java.util.concurrent.CompletableFuture;
@@ -63,3 +63,51 @@ It returns "Default Value" because that’s what was returned from the exception
 Final Output Printed:
 
 The value is printed:
+
+
+
+
+
+
+
+2. Write service layer code using completable future.
+
+
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
+
+    public UserService(UserRepository userRepository, OrderRepository orderRepository) {
+        this.userRepository = userRepository;
+        this.orderRepository = orderRepository;
+    }
+
+    public CompletableFuture<UserDetailsDTO> getUserDetailsAsync(Long userId) {
+        // Fetch user data asynchronously
+        CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(() -> userRepository.findById(userId).orElseThrow());
+
+        // Fetch user orders asynchronously
+        CompletableFuture<List<Order>> ordersFuture = CompletableFuture.supplyAsync(() -> orderRepository.findByUserId(userId));
+
+        // Combine both results once both are available
+        return userFuture.thenCombine(ordersFuture, (user, orders) -> {
+            UserDetailsDTO dto = new UserDetailsDTO();
+            dto.setUserName(user.getName());
+            dto.setEmail(user.getEmail());
+            dto.setOrders(orders);
+            return dto;
+        }).exceptionally(ex -> {
+            // Handle any exception and return fallback value or throw a custom exception
+            System.out.println("Exception occurred: " + ex.getMessage());
+            return new UserDetailsDTO(); // return empty or default object
+        });
+    }
+}
+
+
+
+
+
+
