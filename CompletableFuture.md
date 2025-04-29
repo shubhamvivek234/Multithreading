@@ -1,8 +1,6 @@
-1>CompletableFuture Eaxmple with exception handling
+1. CompletableFuture Eaxmple with exception handling
 
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class CompletableFutureExample {
 
