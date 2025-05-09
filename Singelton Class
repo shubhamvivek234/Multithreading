@@ -1,0 +1,89 @@
+Rules of singelton
+1.Private Constructor
+2. Private Static Instance Variable
+3. Public Static Method (Global Access Point)
+
+
+
+1. Eager Initialization Singleton
+
+public class EagerSingleton {
+    private static final EagerSingleton instance = new EagerSingleton();
+
+    private EagerSingleton() {}
+
+    public static EagerSingleton getInstance() {
+        return instance;
+    }
+}
+
+
+2. Lazy Initialization Singleton
+
+public class LazySingleton {
+    private static LazySingleton instance;
+
+    private LazySingleton() {}
+
+    public static LazySingleton getInstance() {
+        if (instance == null)
+            instance = new LazySingleton();
+        return instance;
+    }
+}
+
+
+3. Thread-safe Singleton Using synchronized
+
+public class SynchronizedSingleton {
+    private static SynchronizedSingleton instance;
+
+    private SynchronizedSingleton() {}
+
+    public static synchronized SynchronizedSingleton getInstance() {
+        if (instance == null)
+            instance = new SynchronizedSingleton();
+        return instance;
+    }
+}
+
+
+
+4.) Double-Checked Locking Singleton 
+public class DoubleCheckedLockingSingleton {
+    private static volatile DoubleCheckedLockingSingleton instance;
+
+    private DoubleCheckedLockingSingleton() {}
+
+    public static DoubleCheckedLockingSingleton getInstance() {
+        if (instance == null) {
+            synchronized (DoubleCheckedLockingSingleton.class) {
+                if (instance == null)
+                    instance = new DoubleCheckedLockingSingleton();
+            }
+        }
+        return instance;
+    }
+}
+
+
+
+
+5.) Bill Pugh Singleton (Best Practice – Inner Static Class)
+📌 Uses a static inner helper class. JVM loads the inner class only when it's referenced, so it's lazy-loaded and thread-safe.
+
+
+public class BillPughSingleton {
+
+    private BillPughSingleton() {}
+
+    private static class SingletonHelper {
+        private static final BillPughSingleton INSTANCE = new BillPughSingleton();
+    }
+
+    public static BillPughSingleton getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
+}
+
+
