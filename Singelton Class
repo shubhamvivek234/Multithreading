@@ -86,4 +86,35 @@ public class BillPughSingleton {
     }
 }
 
+explanation of bill pugh
+
+At first this looks strange.
+Why create another class?
+
+private static class SingletonHelper
+The trick comes from how JVM class loading works.
+
+When this class is loaded: BillPughSingleton the nested helper class does not need to be initialized immediately.
+So initially:
+
+BillPughSingleton loaded
+        |
+        |
+SingletonHelper not initialized
+        |
+No Singleton object yet
+
+
+Then someone calls BillPughSingleton.getInstance()  which accesses: SingletonHelper.INSTANCE
+Now the JVM initializes:SingletonHelper and runs:
+private static final BillPughSingleton INSTANCE =  new BillPughSingleton();
+So creation happens only when requested.
+
+Why is Bill Pugh thread-safe?
+Because JVM guarantees class initialization is synchronized/thread-safe.
+Suppose Thread A and Thread B simultaneously call: getInstance()
+and both try to initialize:SingletonHelperThe JVM ensures only one thread initializes the class.
+So only one:new BillPughSingleton();
+is executed.You get thread safety without manually writing:
+
 
