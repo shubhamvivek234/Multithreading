@@ -1,133 +1,209 @@
-Address Class
+Rules to make a class immutable
+Usually you follow these rules:
+1. Make the class final
+2. Make all fields private
+3. Make instance fields final
+4. Initialize all fields through the constructor
+5. Do not provide setters
+6. If a field refers to a mutable object, use defensive copying
+7. Do not expose mutable internal objects directly from getters
 
-public class Address implements Cloneable{
 
-    String firstLine;
-    String secondLine;
-    String city;
-     
-    public Address(String firstLine, String secondLine, String city) {
-        super();
-        this.firstLine = firstLine;
-        this.secondLine = secondLine;
-        this.city = city;
+examample 
+public final class Employee {
+
+    private final int id;
+    private final String name;
+
+    public Employee(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
- 
-    public String getFirstLine() {
-        return firstLine;
+
+    public int getId() {
+        return id;
     }
- 
-    public void setFirstLine(String firstLine) {
-        this.firstLine = firstLine;
-    }
- 
-    public String getSecondLine() {
-        return secondLine;
-    }
- 
-    public void setSecondLine(String secondLine) {
-        this.secondLine = secondLine;
-    }
- 
-    public String getCity() {
-        return city;
-    }
- 
-    public void setCity(String city) {
-        this.city = city;
-    }
- 
-    @Override
-    public String toString() {
-        return "Address [firstLine=" + firstLine + ", secondLine=" + secondLine 
-                + ", city=" + city + "]";
+
+    public String getName() {
+        return name;
     }
 }
 
 
+What exactly does final mean?
+This is extremely important.
+For primitives:
+private final int age;
 
-USER CLASS
+once initialized:
+age = 30;
 
-public final class User {
-    private final String firstName;
-    private final String lastName;
-    private final Address address;
-     
-    public User(String firstName, String lastName, Address address) {
-        super();
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.address = address;
-    }
-    public String getFirstName() {
-        return firstName;
-    }
-    public String getLastName() {
-        return lastName;
-    }
-    public Address getAddress() {
-        return address;
-    }   
+you cannot later do:
+age = 40;
+
+So for primitives, final effectively fixes the value.
+But with objects, final behaves differently.
+Consider:
+private final List<String> names;
+
+final means:
+The reference cannot point to another list.
+
+It does not mean:
+The List itself cannot change.
+
+Example:
+final List<String> list = new ArrayList<>();
+
+list.add("A");
+list.add("B");
+
+This is legal.
+But this is not:
+list = new ArrayList<>();
+
+
+Problem 1: constructor reference escape
+Imagine:
+List<String> subjects = new ArrayList<>();
+
+subjects.add("Math");
+subjects.add("Physics");
+
+Student student = new Student("Shubham", subjects);
+
+Inside student:
+student.subjects
+       |
+       v
++----------------+
+| Math           |
+| Physics        |
++----------------+
+       ^
+       |
+local subjects
+
+Both references point to exactly the same ArrayList.
+Now outside the class:
+subjects.add("Chemistry");
+
+What happens to the student?
+Its internal list also appears to change:
+System.out.println(student.getSubjects());
+
+Output:
+[Math, Physics, Chemistry]
+
+
+
+
+Solution: defensive copy in the constructor
+Instead of:
+this.subjects = subjects;
+
+do:
+this.subjects = new ArrayList<>(subjects);
+
+Now:
+public Student(String name, List<String> subjects) {
+    this.name = name;
+    this.subjects = new ArrayList<>(subjects);
 }
 
-public final class User {
-    private final String firstName;
-    private final String lastName;
-    private final Address address;
-     
-    public User(String firstName, String lastName, Address address) {
-        super();
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.address = address;
+Then the caller has:
+Caller list
++----------------+
+| Math           |
+| Physics        |
++----------------+
+
+and your Student has its own copy:
+Student list
++----------------+
+| Math           |
+| Physics        |
++----------------+
+
+If caller does:
+subjects.add("Chemistry");
+
+only the caller's list changes.
+Your Student remains unchanged.
+That's called a defensive copy.
+But there is still another problem
+Even after constructor copying:
+public final class Student {
+
+    private final String name;
+    private final List<String> subjects;
+
+    public Student(String name, List<String> subjects) {
+        this.name = name;
+        this.subjects = new ArrayList<>(subjects);
     }
-    public String getFirstName() {
-        return firstName;
+
+    public List<String> getSubjects() {
+        return subjects;
     }
-    public String getLastName() {
-        return lastName;
-    }
-    public Address getAddress() {
-        return address.clone();     // ----------CLONE TO RETURN DEEPCOPY
-    }   
 }
 
-Instead of returning the original Address instance, we will return deep cloned copy of that Adress instance. 
-Even if third party user makes any changes to this cloned address object, it will not affect the original address object of User object.
+someone can do:
+student.getSubjects().add("Chemistry");
 
-clone() method only works if Address has implemented Cloneable interface. If it has not implemented it, then we have to manually
-deep copy all the fields of Address class. But most of the user library has support for Cloneable and Serializable interfaces.
+Why?
+Because getSubjects() returns the actual internal list.
+You have leaked your mutable state.
+So again:
+Outside code
+     |
+     v
+getSubjects()
+     |
+     v
+Student's actual internal List
 
-
-
-Mutable Collections As Field Of Immutable Object
-
-public final class User {
-    String firstName;
-    String lastName;
-    ArrayList<Address> addressList;
-     
-    public User(String firstName, String lastName, ArrayList<Address> addressList) {
-        super();
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.addressList = addressList;
-    }
-    public String getFirstName() {
-        return firstName;
-    }
-    public String getLastName() {
-        return lastName;
-    }
-    public ArrayList<Address> getAddress(){
-        return (ArrayList)Collections.unmodifiableCollection(addressList);      //--deep cloning using unmodifiable collection
-    }     
+The outside code can modify it.
+Solution: defensive copy in getter
+Instead of:
+public List<String> getSubjects() {
+    return subjects;
 }
 
-hese Unmodifiable collections are just a wrapper around normal Collection
-classes which throws UnsupportedOperationException from all the methods which tries to modify Collection i.e. add(), remove()
+use:
+public List<String> getSubjects() {
+    return new ArrayList<>(subjects);
+}
+
+Now callers get a copy.
 
 
 
 
+Modern Java approach: List.copyOf()
+A cleaner approach is often:
+public final class Student {
 
+    private final String name;
+    private final List<String> subjects;
+
+    public Student(String name, List<String> subjects) {
+        this.name = name;
+        this.subjects = List.copyOf(subjects);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<String> getSubjects() {
+        return subjects;
+    }
+}
+
+List.copyOf() creates an unmodifiable list representation.
+Now:
+student.getSubjects().add("Chemistry");
+
+throws:
+UnsupportedOperationException
